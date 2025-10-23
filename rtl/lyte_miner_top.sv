@@ -68,14 +68,14 @@ module lyte_miner_top (
 );
 
     // Internal signals
-    logic [31:0]  core_nonce [0:15];
-    logic [255:0] core_hash [0:15];
-    logic [15:0]  core_valid;
-    logic [15:0]  core_done;
-    logic [15:0]  core_busy;
-    logic [15:0]  core_start;
-    logic [31:0]  core_nonce_start [0:15];
-    logic [31:0]  core_nonce_end [0:15];
+    logic [31:0]  core_nonce [0:63];
+    logic [255:0] core_hash [0:63];
+    logic [63:0]  core_valid;
+    logic [63:0]  core_done;
+    logic [63:0]  core_busy;
+    logic [63:0]  core_start;
+    logic [31:0]  core_nonce_start [0:63];
+    logic [31:0]  core_nonce_end [0:63];
     
     logic [31:0]  nonce_range;
     logic [31:0]  current_nonce_offset;
@@ -148,7 +148,7 @@ module lyte_miner_top (
     // Core nonce range assignment
     always_ff @(posedge clk) begin
         if (current_state == INIT_CORES) begin
-            for (int i = 0; i < 16; i++) begin
+            for (int i = 0; i < 64; i++) begin
                 if (i < core_count) begin
                     core_nonce_start[i] <= current_nonce_offset + (i * nonce_range);
                     core_nonce_end[i] <= current_nonce_offset + ((i + 1) * nonce_range) - 1;
@@ -162,7 +162,7 @@ module lyte_miner_top (
 
     // Core start signals
     always_comb begin
-        for (int i = 0; i < 16; i++) begin
+        for (int i = 0; i < 64; i++) begin
             core_start[i] = (current_state == INIT_CORES) || 
                            (current_state == MINING && core_done[i] && !core_valid[i]);
         end
@@ -177,7 +177,7 @@ module lyte_miner_top (
         end else if (current_state == COLLECT_RESULTS) begin
             // Find the first valid solution
             solution_found <= 1'b0;
-            for (int i = 0; i < 16; i++) begin
+            for (int i = 0; i < 64; i++) begin
                 if (core_valid[i]) begin
                     solution_found <= 1'b1;
                     solution_nonce <= core_nonce[i];
@@ -228,10 +228,10 @@ module lyte_miner_top (
         status <= {5'd0, current_state};
     end
 
-    // Generate mining cores
+    // Generate mining cores (up to 64 cores like Bitcoin MinerSICS)
     genvar i;
     generate
-        for (i = 0; i < 16; i++) begin : mining_cores
+        for (i = 0; i < 64; i++) begin : mining_cores
             lyte_miner_core core_inst (
                 .clk(clk),
                 .rst_n(rst_n),

@@ -7,14 +7,14 @@ LyteSICS is a process node agnostic RTL implementation of a Scrypt-based cryptoc
 - **MinerSICS Compatible**: Follows MinerSICS RTL architecture patterns
 - **Process Node Agnostic**: Works on any standard ASIC process
 - **Scrypt Algorithm**: Complete RTL implementation of Scrypt proof-of-work
-- **Multi-Core Architecture**: Up to 16 parallel mining cores
+- **Multi-Core Architecture**: Up to 64 parallel mining cores (like Bitcoin MinerSICS)
 - **Clean RTL Design**: Optimized for synthesis and verification
 
 ## Architecture
 
 ### RTL Modules
 
-- **`lyte_miner_top.sv`**: Top-level module with multi-core mining
+- **`lyte_miner_top.sv`**: Top-level module with up to 64-core mining
 - **`lyte_miner_core.sv`**: Individual mining core for Scrypt
 - **`scrypt_hash.sv`**: Scrypt algorithm implementation
 - **`pbkdf2_sha256.sv`**: PBKDF2 key derivation function
